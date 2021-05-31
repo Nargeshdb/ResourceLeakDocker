@@ -81,9 +81,9 @@ RUN apt-get install -y python
 RUN apt-get install -y git
 
 # Script to run
-RUN mkdir -p /var/resource_leak/
-COPY ./start.sh /var/resource_leak/start.sh
-RUN chmod +x /var/resource_leak/start.sh
+RUN mkdir -p /var/plumber/
+COPY ./start.sh /var/plumber/start.sh
+RUN chmod +x /var/plumber/start.sh
 
 
 ENV OCC_BRANCH master
@@ -101,11 +101,14 @@ ENV HADOOP_CLEAN "mvn clean"
 
 ENV HBASE_BRANCH with-annotations
 ENV HBASE_REPO https://github.com/Nargeshdb/hbase
-ENV HBASE_CMD "mvn --projects hbase-server --also-make clean compile -DskipTests"
+ENV HBASE_CMD "mvn --projects hbase-server --also-make clean install -DskipTests"
 ENV HBASE_CLEAN "mvn clean"
 
 # download ResourceLeakChecker
 RUN git clone "${OCC_REPO}"
+
+# download Zookeeper
+RUN git clone "${ZK_REPO}"
 
 # download Hadoop
 RUN git clone "${HADOOP_REPO}"
@@ -113,4 +116,9 @@ RUN git clone "${HADOOP_REPO}"
 # download HBase
 RUN git clone "${HBASE_REPO}"
 
-ENTRYPOINT [ "./var/resource_leak/start.sh" ]
+Run cd  /hbase \
+    mvn --projects hbase-server --also-make clean install -DskipTests &> hbase.install.log || echo "Could not build hbase-server" 
+
+Run cd ..
+
+ENTRYPOINT [ "./var/plumber/start.sh" ]
