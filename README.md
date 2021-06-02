@@ -215,6 +215,7 @@ that for each such suppression. Running the checker on that branch and then
 applying the appropriate filter script (`errors-without-custom-types.sh` for
 ZooKeeper; `warnings-without-custom-types.sh` for hbase and hadoop) will show
 the warnings that we examined to make our judgements and justifications.
+(TODO: create this branch)
 
 *Wall-clock time*: the script `build-all-and-collect-timing-info.sh` runs the
 typechecker 5 times on each benchmark. The result in the paper was median of these
