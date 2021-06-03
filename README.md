@@ -143,8 +143,16 @@ prints two sets of results, corresponding to the `hbase-server` and
 the paper contains the sum of the two counts of must call obligations.
 
 *Annos.* and Table 2: use the `anno-counter.sh` script. This script takes
-the name of the case study as input, and outputs the count of each annotation
-in the case study. The number in the "annos." column in Table 1 is the sum of
+a directory as input, and outputs the count of each annotation
+in the directory.  For Zookeeper, you can run `./anno-counter.sh zookeeper` to
+get the counts.  For Hadoop, you must run `./anno-counter.sh
+hadoop/hadoop-hdfs-project/hadoop-hdfs` to get counts from the HDFS module only.
+For HBase, you must run `./anno-counter.sh hbase/hbase-client` and then
+`./anno-counter.sh hbase/hbase-server` and then sum the results.  (TODO: this is
+because there is an `hbase.astub` file we want to ignore; can we hack the script
+to do the right thing?)
+
+The number in the "annos." column in Table 1 is the sum of
 the numbers that are output when the script is run on that program. The numbers
 in Table 2 are the sums across all benchmarks in the different annotation
 categories. In Table 2, some annotation counts are combined: `@Owning` and
@@ -154,8 +162,6 @@ categories. In Table 2, some annotation counts are combined: `@Owning` and
 subclasses when written on a class declaration. Because for technical reasons
 Java doesn't allow type annotations---like `@MustCall`---to be inherited,
 this other annotation was necessary.) These numbers were summed manually.
-(TODO: this is a bit more complicated: for hbase, need to ignore the hbase.astub
-file.  For Hadoop, only want to count in the hdfs folder, not hadoop-common.)
 
 For example, the output of running `./anno-counter.sh zookeeper` is:
 ```
