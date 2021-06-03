@@ -42,7 +42,13 @@ and `baseline` for hadoop.
 run Plumber.
 * `with-annotations`: `with-checker` modified by adding annotations.
 These versions are the ones we used to collect the results in table 1
-(except LoC, which used master).
+(except LoC, which used master).  In this branch, all the warnings that we
+  triaged as part of our case studies are suppressed using `@SuppressWarnings`
+  annotations, with comments indicating whether each warning was a true positive
+  or false positive.
+* `no-suppressions`: `with-annotations`, modified to comment out the warning
+  suppressions.  This branch is useful to see the actual warning messages
+  emitted by the tool.
 
 In addition, the three case studies (zookeeper, hbase, hadoop) have three other
 branches: `no-lo`, `no-ra`, and `no-af`. Each of these branches correspond to
@@ -73,27 +79,29 @@ computed, and describes the scripts you can use to reproduce them.
 
 There is a script for each case study that runs the appropriate build-system
 command named `run-always-call-on-*.sh`, where `*` is the name of the case study
-program. These scripts run on whatever branch is currently checked out in
-the repository, so for example to run the checker on the version of ZooKeeper
-with our annotations, you would run `./run-always-call-on-zookeeper.sh`
-after running `git checkout with-annotations` in the `zookeeper` directory.
-These scripts produce output that includes errors that our checker issues
-about custom classes in the project; in our case studies, we only checked
-classes that are defined in the JDK. To remove output about custom classes,
-we used the `errors-without-custom-types.sh` and
+program. These scripts run on whatever branch is currently checked out in the
+repository, so for example to run the checker on the version of ZooKeeper with
+our annotations and with suppressions commented out, you would run
+`./run-always-call-on-zookeeper.sh` after running `git checkout no-suppressions`
+in the `zookeeper` directory. These scripts produce output that includes errors
+that our checker issues about custom classes in the project; in our case
+studies, we only checked classes that are defined in the JDK. To remove output
+about custom classes, we used the `errors-without-custom-types.sh` and
 `warnings-without-custom-types.sh` scripts. These scripts post-process the
-result of the `run-always-call-on-*.sh` scripts: `errors-without-custom-types.sh`
-post-processes zookeeper, and `warnings-without-custom-types.sh` post-processes
-hadoop and hbase. These scripts take a path to the file containing the output
-of the `run` script as input. For example, to see errors about JDK classes in
-Zookeeper, you would run:
+result of the `run-always-call-on-*.sh` scripts:
+`errors-without-custom-types.sh` post-processes zookeeper, and
+`warnings-without-custom-types.sh` post-processes hadoop and hbase. These
+scripts take a path to the file containing the output of the `run` script as
+input. For example, to see errors about JDK classes in Zookeeper, you would run:
 ```
 ./run-always-call-on-zookeeper.sh > zookeeper-out
 ./errors-without-custom-types.sh zookeeper-out
 ```
 
-On the `with-annotations` branch, the output of these commands should only include
-a failure message from Maven.
+On the `no-suppressions` branch, the output of these commands should be the
+warnings for JDK classes that we triaged in our case studies.  On the
+`with-annotations` branch, there should be no warnings shown (since they are
+suppressed).
 
 To run on hbase or hadoop, use the `warnings-without-custom-types.sh` script
 instead of the `errors-without-custom-types.sh` script (because of differences
