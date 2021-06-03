@@ -127,7 +127,12 @@ The result is (TODO: double check these numbers vs the paper):
 ```
 
 The "Resources" column in table 1 corresponds to the first number (181 in the
-example).
+example).  For Hadoop, the script prints two sets of results like the above; the
+second result (corresponding to the `hadoop-hdfs-project/hadoop-hdfs` module,
+whose warnings we studied) appears in the paper.  For HBase, the script also
+prints two sets of results, corresponding to the `hbase-server` and
+`hbase-client` modules.  As we studied the warnings in both of these modules,
+the paper contains the sum of the two counts of must call obligations.
 
 *Annos.* and Table 2: use the `anno-counter.sh` script. This script takes
 the name of the case study as input, and outputs the count of each annotation
