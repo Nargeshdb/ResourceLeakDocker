@@ -225,8 +225,8 @@ The number of true/false positives were counted by hand by looking at these
 diffs. You can also check the numbers by running these commands in the relevant
 project directories (TODO: double-check that these give the expected numbers):
 ```
-grep -EoniR "TP:" * | wc -l
-grep -EoniR "FP:" * | wc -l
+grep -EoniR "//\s*TP:" * | wc -l
+grep -EoniR "//\s*FP:" * | wc -l
 ```
 
 You can also examine the warnings from our check that led to each of these
