@@ -154,6 +154,8 @@ categories. In Table 2, some annotation counts are combined: `@Owning` and
 subclasses when written on a class declaration. Because for technical reasons
 Java doesn't allow type annotations---like `@MustCall`---to be inherited,
 this other annotation was necessary.) These numbers were summed manually.
+(TODO: this is a bit more complicated: for hbase, need to ignore the hbase.astub
+file.  For Hadoop, only want to count in the hdfs folder, not hadoop-common.)
 
 For example, the output of running `./anno-counter.sh zookeeper` is:
 ```
