@@ -1,10 +1,9 @@
-# Artifact for "Lightweight and Modular Resource Leak Verification" (FSE 2021)
+# Artifact for "Lightweight and Modular Resource Leak Verification" (ESEC/FSE 2021)
 
-This file describes the artifact for "Lightweight and Modular Resource
-Leak Verification", which will be published at FSE 2021. The artifact
-contains the implementation of the tool described in the paper
-("Plumber", section 7) as well as the case study programs used in the
-experiments in section 8.
+This file describes the artifact for "Lightweight and Modular Resource Leak
+Verification", which will be published at ESEC/FSE 2021. The artifact
+contains the implementation of the tool ("Plumber", section 7) and the case
+study programs used in the experiments in section 8.
 
 The artifact contains a Docker environment to ease reproduction. You
 can access it by running the following command on a machine with
@@ -31,27 +30,27 @@ appropriate.
 * the zookeeper case study, in (TODO: absolute path)
 * the hbase case study, in (TODO: absolute path)
 * the hadoop case study, in (TODO: absolute path)
-* the plume-util micro-benchmark, in (TODO: absolute path)
+* the plume-util case study, in (TODO: absolute path)
 
 The four case study programs each have the following branches:
 * `master`/`baseline`: the original program, before we made any modifications.
-These are fixed at the point when we started making edits (i.e. at the commit we
+These are fixed at the point when we started making edits (i.e., at the commit we
 analyzed). This branch is called `master` for zookeeper, hbase, and plume-util;
-and `baseline` for hadoop.
-* `with-checker`: `master`/`baseline` modified with its build system modified to
+it is called `baseline` for hadoop.
+* `with-checker`: `master`/`baseline` with its build system modified to
 run Plumber.
 * `with-annotations`: `with-checker` modified by adding annotations.
 These versions are the ones we used to collect the results in table 1
 (except LoC, which used master).  In this branch, all the warnings that we
-  triaged as part of our case studies are suppressed using `@SuppressWarnings`
-  annotations, with comments indicating whether each warning was a true positive
-  or false positive.
+triaged as part of our case studies are suppressed using `@SuppressWarnings`
+annotations, with comments indicating whether each warning was a true positive
+or false positive.
 * `no-suppressions`: `with-annotations`, modified to comment out the warning
-  suppressions.  This branch is useful to see the actual warning messages
-  emitted by the tool.
+suppressions.  This branch is useful to see the actual warning messages
+emitted by the tool.
 
-In addition, the three case studies (zookeeper, hbase, hadoop) have three other
-branches: `no-lo`, `no-ra`, and `no-af`. Each of these branches correspond to
+In addition, the zookeeper, hbase, and hadoop repositories have three other
+branches: `no-lo`, `no-ra`, and `no-af`. Each branch corresponds to
 one of the conditions for the ablation study in section 8.2: `no-lo` is set up
 to run without lightweight ownership (section 4), `no-ra` without resource
 aliasing (section 5), and `no-af` without ownership creation annotations
@@ -70,65 +69,83 @@ at the end:
 (TODO: exact commands to start the docker image and then run the checker on
 plume-util)
 
-Running these commands on a fresh machine for us took about (TODO: minutes).
+Running these commands takes about (TODO: minutes).
 
 #### Case studies in section 8.1
 
 This section describes how the numbers in tables 1 and 2 in section 8.1 were
 computed, and describes the scripts you can use to reproduce them.
 
-There is a script for each case study that runs the appropriate build-system
-command named `run-always-call-on-*.sh`, where `*` is the name of the case study
-program. These scripts run on whatever branch is currently checked out in the
-repository, so for example to run the checker on the version of ZooKeeper with
-our annotations and with suppressions commented out, you would run
-`./run-always-call-on-zookeeper.sh` after running `git checkout no-suppressions`
-in the `zookeeper` directory. These scripts produce output that includes errors
-that our checker issues about custom classes in the project; in our case
-studies, we only checked classes that are defined in the JDK. To remove output
-about custom classes, we used the `errors-without-custom-types.sh` and
-`warnings-without-custom-types.sh` scripts. These scripts post-process the
-result of the `run-always-call-on-*.sh` scripts:
-`errors-without-custom-types.sh` post-processes zookeeper, and
-`warnings-without-custom-types.sh` post-processes hadoop and hbase. These
-scripts take a path to the file containing the output of the `run` script as
-input. For example, to see errors about JDK classes in Zookeeper, you would run:
+For the Zookeeper case study, to see all the checker's warnings about JDK
+classes, run 
 ```
+git -C zookeeper checkout no-suppressions
 ./run-always-call-on-zookeeper.sh > zookeeper-out
 ./errors-without-custom-types.sh zookeeper-out
 ```
 
-On the `no-suppressions` branch, the output of these commands should be the
-warnings for JDK classes that we triaged in our case studies.  On the
-`with-annotations` branch, there should be no warnings shown (since they are
-suppressed).
+If you use the `with-annotations` branch instead, you will see no warnings
+shown (since they are suppressed).
+The `zookeeper-out` file contains warnings about JDK clasess and classes
+defined in the program; the `errors-without-custom-types.sh` script removes
+the warnings about classes defined in the program.
+(TODO: Why didn't we use -Askipuses for this?)
 
-To run on hbase or hadoop, use the `warnings-without-custom-types.sh` script
-instead of the `errors-without-custom-types.sh` script (because of differences
-in the build systems, these projects issue "warnings" instead of "errors", so
-the post-processing scripts must `grep` for different things).
+For Hadoop and HBase, the corresponding commands are
 
-*LoC*: Lines of non-comment, non-blank code were computed using the `scc` program
-available here: https://github.com/boyter/scc. This program is installed
-in the docker image. (TODO: install scc on the docker) To compute LoC, first
-checkout the `master` branch of the case study program (`baseline` for hadoop).
-Then, `cd` to the `src` directory for the component and run `scc`. The figure
-in the paper should be the result in the "code" column.
+```
+git -C hadoop checkout no-suppressions
+./run-always-call-on-hadoop.sh > hadoop-out
+./warnings-without-custom-types.sh hadoop-out
+```
+
+```
+git -C hbase checkout no-suppressions
+./run-always-call-on-hbase.sh > hbase-out
+./warnings-without-custom-types.sh hbase-out
+```
+
+The use of the `errors-without-custom-types.sh` script versus the
+`warnings-without-custom-types.sh` script is because of differences in the
+build systems:  some of the build systems make the compiler issue
+"warnings" instead of "errors", so the post-processing scripts must `grep`
+for different things.
+
+*LoC*: Lines of non-comment, non-blank code were computed using the
+[`scc`](https://github.com/boyter/scc) program, which is installed
+in the docker image. (TODO: install scc on the docker) To compute LoC, take
+the "code" column from the output of:
+```
+git -C zookeeper checkout master
+(cd zookeeper/zookeeper-server/src && scc)
+
+git -C hadoop checkout baseline
+(cd hadoop/TODO/src && scc)
+
+git -C hbase checkout master
+(cd hbase/TODO/src && scc)
+```
 
 *Resources*: The "Resources" column in table 1 is computed by the
 checker. It records every resource that it tracks, and then outputs
 two lines after completing checking: one that lists the number of
 resources it checked, and another that lists the number of verified
-resources. To acquire these numbers, first run the checker on a case
-study program via the appropriate `run-always-call-on-*.sh` script,
-and pipe the output to a file. Then, run the `resource-counts.sh`
-script on the file. For example, to compute the values for ZooKeeper:
+resources. To acquire these numbers:
 ```
-./run-always-call-on-zookeeeper.sh &> zookeeper-out
+git -C zookeeper checkout with-annotations
+./run-always-call-on-zookeeper.sh > zookeeper-out
 ./resource-counts.sh zookeeper-out
+
+git -C hadoop checkout with-annotations
+./run-always-call-on-hadoop.sh > hadoop-out
+./resource-counts.sh hadoop-out
+
+git -C hbase checkout with-annotations
+./run-always-call-on-hbase.sh > hbase-out
+./resource-counts.sh hbase-out
 ```
 
-The result is (TODO: double check these numbers vs the paper):
+The result for Zookeeper is (TODO: double check these numbers vs the paper):
 ```
 [WARNING] Found 181 must call obligation(s).
 [WARNING] Successfully verified 129 must call obligation(s).
@@ -195,8 +212,7 @@ name to the other rows).
 
 > git diff origin/with-checker -- '*.java'
 
-3. Look through the results and count (I used some scratch paper - the
-numbers should be pretty small) how many added (in green) lines there
+3. Look through the results and count how many added (in green) lines there
 are that do NOT match one of the following conditions (i.e. discard
 any lines like the following):
 
@@ -206,7 +222,7 @@ any lines like the following):
 * lines that contain only a warning suppression
 * lines which changed only to add one or more annotations
 
-For each change recorded this way, also write down the reason for the change.
+For each change, also record the reason for the change.
 
 *TPs and FPs*: the `with-annotations` branch includes an `@SuppressWarnings`
 annotation for each warning that our checker issues about a class defined
@@ -229,6 +245,8 @@ grep -EoniR "//\s*TP:" * | wc -l
 grep -EoniR "//\s*FP:" * | wc -l
 ```
 
+(TODO: Mike suggests deleting this paragraph, since the same information
+was given above.  And also because he found this text a bit hard to follow.)
 You can also examine the warnings from our check that led to each of these
 suppressions by commenting out each warning suppression and then re-running
 the checker. Each case study has a branch `no-suppressions` on which we've done
@@ -238,10 +256,10 @@ ZooKeeper; `warnings-without-custom-types.sh` for hbase and hadoop) will show
 the warnings that we examined to make our judgements and justifications.
 (TODO: create this branch)
 
-*Wall-clock time*: the script `build-all-and-collect-timing-info.sh` runs the
-typechecker 5 times on each benchmark. The result in the paper was median of these
-five runs, on the machine the paper describes. You could run this script if you
-really want to, but we don't suggest it (it takes ~2 hours).
+*Wall-clock time*: the script `build-all-and-collect-timing-info.sh` runs
+the typechecker 5 times on each benchmark. The result in the paper was
+median of these five runs, on the machine the paper describes. This script
+takes ~2 hours to run.
 
 #### Ablation study (section 8.2)
 
