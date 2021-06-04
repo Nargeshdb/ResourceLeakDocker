@@ -166,4 +166,21 @@ RUN (./run-always-call-on-zookeeper.sh > zookeeper-out 2>&1) || true
 RUN ./run-always-call-on-hadoop.sh > hadoop-out 2>&1
 RUN ./run-always-call-on-hbase.sh > hbase-out 2>&1
 
+# switch back to with-annotations branch
+RUN cd plume-util \
+    && git checkout with-annotations \
+    && cd ..
+
+RUN cd zookeeper \
+    && git checkout with-annotations \
+    && cd ..
+
+RUN cd hadoop \
+    && git checkout with-annotations \
+    && cd ..
+
+RUN cd hbase \
+    && git checkout with-annotations \
+    && cd ..
+
 CMD ["/bin/bash"]
