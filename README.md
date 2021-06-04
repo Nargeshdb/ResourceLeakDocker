@@ -12,7 +12,7 @@ Docker installed:
 
 TODO: the command
 
-See the INSTALLATION.md file for more information on how the Docker image
+See the INSTALL.md file for more information on how the Docker image
 was produced, and instructions on how to build the tool outside of Docker
 (i.e., if you wish to make modifications to the tool or build off of it).
 
@@ -42,7 +42,13 @@ and `baseline` for hadoop.
 run Plumber.
 * `with-annotations`: `with-checker` modified by adding annotations.
 These versions are the ones we used to collect the results in table 1
-(except LoC, which used master).
+(except LoC, which used master).  In this branch, all the warnings that we
+  triaged as part of our case studies are suppressed using `@SuppressWarnings`
+  annotations, with comments indicating whether each warning was a true positive
+  or false positive.
+* `no-suppressions`: `with-annotations`, modified to comment out the warning
+  suppressions.  This branch is useful to see the actual warning messages
+  emitted by the tool.
 
 In addition, the three case studies (zookeeper, hbase, hadoop) have three other
 branches: `no-lo`, `no-ra`, and `no-af`. Each of these branches correspond to
@@ -73,27 +79,29 @@ computed, and describes the scripts you can use to reproduce them.
 
 There is a script for each case study that runs the appropriate build-system
 command named `run-always-call-on-*.sh`, where `*` is the name of the case study
-program. These scripts run on whatever branch is currently checked out in
-the repository, so for example to run the checker on the version of ZooKeeper
-with our annotations, you would run `./run-always-call-on-zookeeper.sh`
-after running `git checkout with-annotations` in the `zookeeper` directory.
-These scripts produce output that includes errors that our checker issues
-about custom classes in the project; in our case studies, we only checked
-classes that are defined in the JDK. To remove output about custom classes,
-we used the `errors-without-custom-types.sh` and
+program. These scripts run on whatever branch is currently checked out in the
+repository, so for example to run the checker on the version of ZooKeeper with
+our annotations and with suppressions commented out, you would run
+`./run-always-call-on-zookeeper.sh` after running `git checkout no-suppressions`
+in the `zookeeper` directory. These scripts produce output that includes errors
+that our checker issues about custom classes in the project; in our case
+studies, we only checked classes that are defined in the JDK. To remove output
+about custom classes, we used the `errors-without-custom-types.sh` and
 `warnings-without-custom-types.sh` scripts. These scripts post-process the
-result of the `run-always-call-on-*.sh` scripts: `errors-without-custom-types.sh`
-post-processes zookeeper, and `warnings-without-custom-types.sh` post-processes
-hadoop and hbase. These scripts take a path to the file containing the output
-of the `run` script as input. For example, to see errors about JDK classes in
-Zookeeper, you would run:
+result of the `run-always-call-on-*.sh` scripts:
+`errors-without-custom-types.sh` post-processes zookeeper, and
+`warnings-without-custom-types.sh` post-processes hadoop and hbase. These
+scripts take a path to the file containing the output of the `run` script as
+input. For example, to see errors about JDK classes in Zookeeper, you would run:
 ```
 ./run-always-call-on-zookeeper.sh > zookeeper-out
 ./errors-without-custom-types.sh zookeeper-out
 ```
 
-On the `with-annotations` branch, the output of these commands should only include
-a failure message from Maven.
+On the `no-suppressions` branch, the output of these commands should be the
+warnings for JDK classes that we triaged in our case studies.  On the
+`with-annotations` branch, there should be no warnings shown (since they are
+suppressed).
 
 To run on hbase or hadoop, use the `warnings-without-custom-types.sh` script
 instead of the `errors-without-custom-types.sh` script (because of differences
@@ -127,11 +135,24 @@ The result is (TODO: double check these numbers vs the paper):
 ```
 
 The "Resources" column in table 1 corresponds to the first number (181 in the
-example).
+example).  For Hadoop, the script prints two sets of results like the above; the
+second result (corresponding to the `hadoop-hdfs-project/hadoop-hdfs` module,
+whose warnings we studied) appears in the paper.  For HBase, the script also
+prints two sets of results, corresponding to the `hbase-server` and
+`hbase-client` modules.  As we studied the warnings in both of these modules,
+the paper contains the sum of the two counts of must call obligations.
 
 *Annos.* and Table 2: use the `anno-counter.sh` script. This script takes
-the name of the case study as input, and outputs the count of each annotation
-in the case study. The number in the "annos." column in Table 1 is the sum of
+a directory as input, and outputs the count of each annotation
+in the directory.  For Zookeeper, you can run `./anno-counter.sh zookeeper` to
+get the counts.  For Hadoop, you must run `./anno-counter.sh
+hadoop/hadoop-hdfs-project/hadoop-hdfs` to get counts from the HDFS module only.
+For HBase, you must run `./anno-counter.sh hbase/hbase-client` and then
+`./anno-counter.sh hbase/hbase-server` and then sum the results.  (TODO: this is
+because there is an `hbase.astub` file we want to ignore; can we hack the script
+to do the right thing?)
+
+The number in the "annos." column in Table 1 is the sum of
 the numbers that are output when the script is run on that program. The numbers
 in Table 2 are the sums across all benchmarks in the different annotation
 categories. In Table 2, some annotation counts are combined: `@Owning` and
@@ -204,8 +225,8 @@ The number of true/false positives were counted by hand by looking at these
 diffs. You can also check the numbers by running these commands in the relevant
 project directories (TODO: double-check that these give the expected numbers):
 ```
-grep -EoniR "TP:" * | wc -l
-grep -EoniR "FP:" * | wc -l
+grep -EoniR "//\s*TP:" * | wc -l
+grep -EoniR "//\s*FP:" * | wc -l
 ```
 
 You can also examine the warnings from our check that led to each of these
