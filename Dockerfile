@@ -17,6 +17,14 @@ RUN apt-get update && \
     apt-get clean && \
     update-ca-certificates -f;
 
+## Create a new user 
+RUN useradd -ms /bin/bash fse && \
+    apt-get install -y sudo && \
+    adduser fse sudo && \
+    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER fse
+WORKDIR /home/fse
+
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 RUN export JAVA_HOME
 
@@ -107,6 +115,15 @@ ENV HBASE_CLEAN "mvn clean"
 # download ResourceLeakChecker
 RUN git clone "${OCC_REPO}"
 
+RUN cd object-construction-checker \
+    git checkout "${OCC_BRANCH}" \
+    git pull \
+    ./gradlew install \
+    cd .. \
+
+ENV CURDIR $(pwd)
+COPY ./CURDIR/object-construction-checker/experimental-machinery/ablation/ /CURDIR/
+
 # download Zookeeper
 RUN git clone "${ZK_REPO}"
 
@@ -116,9 +133,10 @@ RUN git clone "${HADOOP_REPO}"
 # download HBase
 RUN git clone "${HBASE_REPO}"
 
-Run cd  /hbase \
-    mvn --projects hbase-server --also-make clean install -DskipTests &> hbase.install.log || echo "Could not build hbase-server" 
 
-Run cd ..
+# Run cd  /hbase \
+#     mvn --projects hbase-server --also-make clean install -DskipTests &> hbase.install.log || echo "Could not build hbase-server" 
 
-RUN [ "./var/plumber/start.sh" ]
+# Run cd ..
+
+# RUN [ "./var/plumber/start.sh" ]
