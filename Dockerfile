@@ -101,17 +101,16 @@ RUN export JAVA8_HOME
 ENV OCC_BRANCH master
 ENV OCC_REPO https://github.com/kelloggm/object-construction-checker.git
 
-#ENV ZK_BRANCH with-annotations
+ENV PU_REPO=https://github.com/kelloggm/plume-util.git
+
 ENV ZK_REPO https://github.com/kelloggm/zookeeper.git
 ENV ZK_CMD "mvn --projects zookeeper-server --also-make clean install -DskipTests"
 ENV ZK_CLEAN "mvn clean"
 
-#ENV HADOOP_BRANCH with-annotations
 ENV HADOOP_REPO https://github.com/Nargeshdb/hadoop
 ENV HADOOP_CMD "mvn --projects hadoop-hdfs-project/hadoop-hdfs --also-make clean compile -DskipTests"
 ENV HADOOP_CLEAN "mvn clean"
 
-#ENV HBASE_BRANCH with-annotations
 ENV HBASE_REPO https://github.com/Nargeshdb/hbase
 ENV HBASE_CMD "mvn --projects hbase-server --also-make clean install -DskipTests"
 ENV HBASE_CLEAN "mvn clean"
@@ -127,35 +126,35 @@ RUN cd object-construction-checker \
 RUN cp object-construction-checker/experimental-machinery/ablation/*.sh .
 RUN cp object-construction-checker/experimental-machinery/case-studies/*.sh .
 
+# download plume-util
+RUN git clone "${PU_REPO}"
+RUN cd plume-util \
+    && git checkout no-suppressions \
+    && cd ..
+
 # download Zookeeper
 RUN git clone "${ZK_REPO}"
 RUN cd zookeeper \
-    && git checkout with-annotations \
+    && git checkout no-suppressions \
     && cd ..
 
 # download Hadoop
 RUN git clone "${HADOOP_REPO}"
 RUN cd hadoop \
-    && git checkout with-annotations \
+    && git checkout no-suppressions \
     && cd ..
 
 # download HBase
 RUN git clone "${HBASE_REPO}"
 RUN cd hbase \
-    && git checkout with-annotations \
+    && git checkout no-suppressions \
     && cd ..
 
 # analyze all the benchmarks once to populate local Maven repository
-RUN ./run-always-call-on-zookeeper.sh
-RUN ./run-always-call-on-hadoop.sh
-RUN ./run-always-call-on-hbase.sh
-
-# Run cd  /hbase \
-#     mvn --projects hbase-server --also-make clean install -DskipTests &> hbase.install.log || echo "Could not build hbase-server" 
-
-# Run cd ..
-
-# RUN [ "./var/plumber/start.sh" ]
-
+# our checker emits errors for plume-util and zookeeper, hence the '|| true'
+RUN (./run-always-call-on-plume-util.sh > plume-util-out 2>&1) || true
+RUN (./run-always-call-on-zookeeper.sh > zookeeper-out 2>&1) || true
+RUN ./run-always-call-on-hadoop.sh > hadoop-out 2>&1
+RUN ./run-always-call-on-hbase.sh > hbase-out 2>&1
 
 CMD ["/bin/bash"]
