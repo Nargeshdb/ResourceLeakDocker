@@ -121,4 +121,4 @@ Run cd  /hbase \
 
 Run cd ..
 
-ENTRYPOINT [ "./var/plumber/start.sh" ]
+RUN [ "./var/plumber/start.sh" ]
