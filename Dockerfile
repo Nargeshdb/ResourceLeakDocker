@@ -31,20 +31,6 @@ RUN apt-get install -y python
 # Install git
 RUN apt-get install -y git
 
-## Create a new user 
-RUN useradd -ms /bin/bash fse && \
-    apt-get install -y sudo && \
-    adduser fse sudo && \
-    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-USER fse
-WORKDIR /home/fse
-
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
-RUN export JAVA_HOME
-
-ENV JAVA8_HOME /usr/lib/jvm/java-8-openjdk-amd64/
-RUN export JAVA8_HOME
-
 # Install Maven
 ARG MAVEN_VERSION=3.6.3
 ARG USER_HOME_DIR="/root"
@@ -91,12 +77,25 @@ ENV GRADLE_USER_HOME /cache
 ENV PATH $PATH:$GRADLE_HOME/bin
 VOLUME $GRADLE_USER_HOME
 
+## Create a new user
+RUN useradd -ms /bin/bash fse && \
+    apt-get install -y sudo && \
+    adduser fse sudo && \
+    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+USER fse
+WORKDIR /home/fse
+
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+RUN export JAVA_HOME
+
+ENV JAVA8_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+RUN export JAVA8_HOME
 
 # Script to run
 # TODO do we still need this?
-RUN mkdir -p /var/plumber/
-COPY ./start.sh /var/plumber/start.sh
-RUN chmod +x /var/plumber/start.sh
+#RUN mkdir -p /var/plumber/
+#COPY ./start.sh /var/plumber/start.sh
+#RUN chmod +x /var/plumber/start.sh
 
 
 ENV OCC_BRANCH master
@@ -124,7 +123,7 @@ RUN cd object-construction-checker \
     git checkout "${OCC_BRANCH}" \
     git pull \
     ./gradlew install \
-    cd .. \
+    cd ..
 
 RUN cp object-construction-checker/experimental-machinery/ablation/*.sh .
 RUN cp object-construction-checker/experimental-machinery/case-studies/*.sh .
@@ -133,19 +132,19 @@ RUN cp object-construction-checker/experimental-machinery/case-studies/*.sh .
 RUN git clone "${ZK_REPO}"
 RUN cd zookeeper \
     git checkout with-annotations \
-    cd .. \
+    cd ..
 
 # download Hadoop
 RUN git clone "${HADOOP_REPO}"
 RUN cd hadoop \
     git checkout with-annotations \
-    cd .. \
+    cd ..
 
 # download HBase
 RUN git clone "${HBASE_REPO}"
 RUN cd hbase \
     git checkout with-annotations \
-    cd .. \
+    cd ..
 
 # analyze all the benchmarks once to populate local Maven repository
 RUN ./run-always-call-on-zookeeper.sh
