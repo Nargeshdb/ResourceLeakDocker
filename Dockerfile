@@ -73,9 +73,9 @@ RUN mkdir -p /usr/share/gradle /usr/share/gradle/ref \
   && ln -s /usr/share/gradle/gradle-${GRADLE_VERSION} /usr/bin/gradle
 ENV GRADLE_VERSION 6.8.3
 ENV GRADLE_HOME /usr/bin/gradle
-ENV GRADLE_USER_HOME /cache
+#ENV GRADLE_USER_HOME /cache
 ENV PATH $PATH:$GRADLE_HOME/bin
-VOLUME $GRADLE_USER_HOME
+#VOLUME $GRADLE_USER_HOME
 
 ## Create a new user
 RUN useradd -ms /bin/bash fse && \
@@ -120,10 +120,9 @@ ENV HBASE_CLEAN "mvn clean"
 RUN git clone "${OCC_REPO}"
 
 RUN cd object-construction-checker \
-    git checkout "${OCC_BRANCH}" \
-    git pull \
-    ./gradlew install \
-    cd ..
+    && git checkout "${OCC_BRANCH}" \
+    && ./gradlew install \
+    && cd ..
 
 RUN cp object-construction-checker/experimental-machinery/ablation/*.sh .
 RUN cp object-construction-checker/experimental-machinery/case-studies/*.sh .
@@ -131,20 +130,20 @@ RUN cp object-construction-checker/experimental-machinery/case-studies/*.sh .
 # download Zookeeper
 RUN git clone "${ZK_REPO}"
 RUN cd zookeeper \
-    git checkout with-annotations \
-    cd ..
+    && git checkout with-annotations \
+    && cd ..
 
 # download Hadoop
 RUN git clone "${HADOOP_REPO}"
 RUN cd hadoop \
-    git checkout with-annotations \
-    cd ..
+    && git checkout with-annotations \
+    && cd ..
 
 # download HBase
 RUN git clone "${HBASE_REPO}"
 RUN cd hbase \
-    git checkout with-annotations \
-    cd ..
+    && git checkout with-annotations \
+    && cd ..
 
 # analyze all the benchmarks once to populate local Maven repository
 RUN ./run-always-call-on-zookeeper.sh
