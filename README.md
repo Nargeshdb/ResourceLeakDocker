@@ -2,7 +2,7 @@
 
 This file describes the artifact for "Lightweight and Modular Resource Leak
 Verification", which will be published at ESEC/FSE 2021. The artifact
-contains the implementation of the tool ("Plumber", section 7) and the case
+contains the implementation of the tool ("Resource Leak Checker", section 7) and the case
 study programs used in the experiments in section 8.
 
 The artifact contains a Docker environment to ease reproduction. You
@@ -26,7 +26,7 @@ was produced, and instructions on how to build the tool outside of Docker
 ### Contents
 
 The Docker image contains the following 5 git repositories, all under `/home/fse`:
-* the Plumber tool itself, in the `object-construction-checker` sub-directory. The three
+* the Resource Leak Checker tool itself, in the `object-construction-checker` sub-directory. The three
 parts of section 3 of the paper correspond to three parts of this repository:
 section 3.1 corresponds to the must-call-checker subproject; section 3.2
 corresponds to most of the object-construction-checker subproject (this
@@ -46,7 +46,7 @@ These are fixed at the point when we started making edits (i.e., at the commit w
 analyzed). This branch is called `master` for zookeeper, hbase, and plume-util;
 it is called `baseline` for hadoop.
 * `with-checker`: `master`/`baseline` with its build system modified to
-run Plumber.
+run the Resource Leak Checker.
 * `with-annotations`: `with-checker` modified by adding annotations.
 These versions are the ones we used to collect the results in table 1
 (except LoC, which used master).  In this branch, all the warnings that we
