@@ -200,6 +200,11 @@ hadoop/hadoop-hdfs-project/hadoop-hdfs` to get counts from the HDFS module only.
 For HBase, you must run `./anno-counter.sh hbase/hbase-client` and then
 `./anno-counter.sh hbase/hbase-server` and then sum the results.
 
+Before running `./anno-counter.sh` on a case study, make sure you're on
+the branch you want to measure. Our annotations are on the `with-annotations`
+branch of each project; you should expect all 0s if you measure the
+`master` or `baseline` branches.
+
 The number in the "annos." column in Table 1 is the sum of
 the numbers that are output when the script is run on that program. The numbers
 in Table 2 are the sums across all benchmarks in the different annotation
