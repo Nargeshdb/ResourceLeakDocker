@@ -217,7 +217,8 @@ subclasses when written on a class declaration. Because for technical reasons
 Java doesn't allow type annotations---like `@MustCall`---to be inherited,
 this other annotation was necessary.) These numbers were summed manually.
 
-For example, the output of running `./anno-counter.sh zookeeper` is:
+For example, the output of running `./anno-counter.sh zookeeper` on
+the `with-annotations` branch is:
 ```
 @Owning:
       34
