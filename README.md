@@ -143,6 +143,9 @@ build systems:  some of the build systems make the compiler issue
 "warnings" instead of "errors", so the post-processing scripts must `grep`
 for different things.
 
+Our checker does not issue any warnings or errors about non-JDK classes
+in plume-util, so no post-processing script is necessary.
+
 *LoC*: Lines of non-comment, non-blank code were computed using the
 [`scc`](https://github.com/boyter/scc) program, which is installed
 in the docker image.  To compute LoC, take
@@ -201,35 +204,38 @@ The number in the "annos." column in Table 1 is the sum of
 the numbers that are output when the script is run on that program. The numbers
 in Table 2 are the sums across all benchmarks in the different annotation
 categories. In Table 2, some annotation counts are combined: `@Owning` and
-`@NotOwning` are combined in the "@Owning and @NotOwning" row, and
-`@InheritableMustCall` annotations are included in the `@MustCall` counts.
+`@NotOwning` are combined in the "@Owning and @NotOwning" row,
+`@InheritableMustCall` annotations are included in the `@MustCall` counts,
+and `@PolyMustCall` annotations are included in the `@MustCallAlias` counts.
 (`@InheritableMustCall` is a version of `@MustCall` that can be inherited by
 subclasses when written on a class declaration. Because for technical reasons
 Java doesn't allow type annotations---like `@MustCall`---to be inherited,
 this other annotation was necessary.) These numbers were summed manually.
 
-For example, the output of running `./anno-counter.sh zookeeper` is (TODO: update):
+For example, the output of running `./anno-counter.sh zookeeper` is:
 ```
 @Owning:
-33
-@NotOwning:
-8
+      34
+@NotOwning (counted with @Owning):
+       8
 @EnsuresCalledMethods:
-23
+      25
 @MustCall:
-17
-@InheritableMustCall:
-5
+      13
+@InheritableMustCall (counted with @MustCall):
+       5
 @MustCallAlias:
-4
+       4
+@PolyMustCall (counted with @MustCallAlias):
+       4
 @CreatesObligation:
-35
+      29
 ```
 
-The total number of annotations in ZooKeeper is therefore 125 in Table 1,
-and ZooKeeper contributes 41 to the "@Owning and @NotOwning" row and
-22 to the "@MustCall" row in Table 2 (and the amount shown after the annotation
-name to the other rows).
+The total number of annotations in ZooKeeper is therefore 122 in Table
+1, and ZooKeeper contributes 42 to the "@Owning and @NotOwning" row,
+22 to the "@MustCall" row, and 8 to the `@MustCallAlias` row in Table
+2 (and the amount shown after the annotation name to the other rows).
 
 *Code changes*: these were counted manually using the following procedure:
 
