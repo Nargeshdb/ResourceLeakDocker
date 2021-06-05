@@ -33,7 +33,6 @@ RUN apt-get install -y git
 
 # Install Maven
 ARG MAVEN_VERSION=3.6.3
-ARG USER_HOME_DIR="/root"
 ARG SHA=c35a1803a6e70a126e80b2b3ae33eed961f83ed74d18fcd16909b2d44d7dada3203f1ffe726c17ef8dcca2dcaa9fca676987befeadc9b9f759967a8cb77181c0
 ARG BASE_URL=https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
@@ -52,7 +51,6 @@ RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
   && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
 
 ENV MAVEN_HOME /usr/share/maven
-ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 
 #Install Gradle
 ARG GRADLE_VERSION=6.8.3
@@ -77,6 +75,22 @@ ENV GRADLE_HOME /usr/bin/gradle
 ENV PATH $PATH:$GRADLE_HOME/bin
 #VOLUME $GRADLE_USER_HOME
 
+# Install scc
+ARG SCC_3_SHA=04f9e797b70a678833e49df5e744f95080dfb7f963c0cd34f5b5d4712d290f33
+RUN mkdir -p /usr/share/scc \
+  && echo "Downloading scc" \
+  && curl -fsSL -o /tmp/scc.zip https://github.com/boyter/scc/releases/download/v3.0.0/scc-3.0.0-arm64-unknown-linux.zip \
+  \
+  && echo "Checking download hash" \
+  && echo "${SCC_3_SHA} /tmp/scc.zip" | sha256sum -c - \
+  \
+  && echo "Unzipping scc" \
+  && unzip -d /usr/share/scc /tmp/scc.zip \
+  \
+  && echo "Cleaning and setting links" \
+  && rm -f /tmp/scc.zip \
+  && ln -s /usr/share/scc/scc /usr/bin/scc
+
 ## Create a new user
 RUN useradd -ms /bin/bash fse && \
     apt-get install -y sudo && \
@@ -90,13 +104,6 @@ RUN export JAVA_HOME
 
 ENV JAVA8_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 RUN export JAVA8_HOME
-
-# Script to run
-# TODO do we still need this?
-#RUN mkdir -p /var/plumber/
-#COPY ./start.sh /var/plumber/start.sh
-#RUN chmod +x /var/plumber/start.sh
-
 
 ENV OCC_BRANCH master
 ENV OCC_REPO https://github.com/kelloggm/object-construction-checker.git
@@ -156,5 +163,22 @@ RUN (./run-always-call-on-plume-util.sh > plume-util-out 2>&1) || true
 RUN (./run-always-call-on-zookeeper.sh > zookeeper-out 2>&1) || true
 RUN ./run-always-call-on-hadoop.sh > hadoop-out 2>&1
 RUN ./run-always-call-on-hbase.sh > hbase-out 2>&1
+
+# switch back to with-annotations branch
+RUN cd plume-util \
+    && git checkout with-annotations \
+    && cd ..
+
+RUN cd zookeeper \
+    && git checkout with-annotations \
+    && cd ..
+
+RUN cd hadoop \
+    && git checkout with-annotations \
+    && cd ..
+
+RUN cd hbase \
+    && git checkout with-annotations \
+    && cd ..
 
 CMD ["/bin/bash"]
