@@ -5,11 +5,18 @@ Verification", which will be published at ESEC/FSE 2021. The artifact
 contains the implementation of the tool ("Resource Leak Checker", section 7) and the case
 study programs used in the experiments in section 8.
 
-The artifact contains a Docker environment to ease reproduction. You
-can access it by running the following command on a machine with
-Docker installed:
+The artifact is a Docker environment, to ease reproduction. You
+can access it on Zenodo [here](https://zenodo.org/record/4902322#.YLrTMC1h1TY).
+Install docker (instructions are [here](https://www.docker.com/get-started)),
+and then download the artifact.
+Then, run the following commands (substituting as
+appropriate for your machine):
 
-TODO: the command
+```
+gunzip -c path/to/resource-leak-checker.tar.gz > resource-leak-checker.tar
+docker load < resource-leak-checker.tar
+docker run -it msridhar/rlc:manual-update
+```
 
 This command will log you into a bash shell inside the Docker container as the
 `fse` user, in the `/home/fse` directory.  All relevant code and scripts are
@@ -17,9 +24,9 @@ present within that directory.  We provide saved outputs from our checker for
 all the case studies in the same directory, and you can run scripts to
 re-generate the outputs if desired (detailed instructions below).
 
-**Note**: running our checker within Docker may require increasing Docker's memory
-limit for containers.  We set a memory limit of 14GB for Docker when running the
-container.
+**Note**: running our checker within Docker may require increasing
+Docker's memory limit for containers.  We set a memory limit of 14GB
+for Docker when running the container.
 
 See the INSTALL.md file for more information on how the Docker image
 was produced, and instructions on how to build the tool outside of Docker
@@ -74,9 +81,7 @@ The scripts you'll need to run the experiments are all present in the
 #### Kicking the tires
 
 If you just want to make sure that everything **can** run, we suggest running
-the following commands.  First, start the Docker image:
-
-TODO: command to start the Docker image
+the following commands. Load the docker image following the commands above.
 
 Then, within the Docker image in the initial directory (`/home/fse`), analyze
 plume-util: 
@@ -87,7 +92,7 @@ plume-util:
 
 Check that you get a "BUILD SUCCESSFUL" message at the end.
 
-Running these commands takes about (TODO: minutes).
+Running this command should take less than a minute on commodity hardware.
 
 #### Case studies in section 8.1
 

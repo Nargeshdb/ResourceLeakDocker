@@ -1,13 +1,7 @@
 #### Reproducing our results
 
-To reproduce our results, you can use our docker image. Install Docker,
-then run the following command to run our image:
-
-```
-(TODO: exact docker command)
-```
-
-Then, follow the instructions in README.md.
+To reproduce our results, you can use our docker image. Install Docker
+and follow the instructions at the beginning of README.md.
 
 #### Kicking the tires
 
