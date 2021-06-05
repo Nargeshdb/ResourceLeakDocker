@@ -28,9 +28,8 @@ re-generate the outputs if desired (detailed instructions below).
 Docker's memory limit for containers.  We set a memory limit of 14GB
 for Docker when running the container.
 
-See the INSTALL.md file for more information on how the Docker image
-was produced, and instructions on how to build the tool outside of Docker
-(i.e., if you wish to make modifications to the tool or build off of it).
+See the INSTALL.md file if you are interested in extending our tool,
+rather than reproducing the results in the paper.
 
 ### Contents
 
