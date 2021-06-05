@@ -13,7 +13,9 @@ TODO: the command
 
 This command will log you into a bash shell inside the Docker container as the
 `fse` user, in the `/home/fse` directory.  All relevant code and scripts are
-present within that directory.
+present within that directory.  We provide saved outputs from our checker for
+all the case studies in the same directory, and you can run scripts to
+re-generate the outputs if desired (detailed instructions below).
 
 Note that running our tool within Docker may require increasing Docker's memory
 limit for containers.  We set a memory limit of 14GB for Docker when running the
