@@ -145,10 +145,10 @@ git -C hbase checkout with-annotations
 ./resource-counts.sh hbase-out
 ```
 
-The result for Zookeeper is (TODO: double check these numbers vs the paper):
+The result for Zookeeper is:
 ```
-[WARNING] Found 181 must call obligation(s).
-[WARNING] Successfully verified 129 must call obligation(s).
+[WARNING] Found 177 must call obligation(s).
+[WARNING] Successfully verified 131 must call obligation(s).
 ```
 
 The "Resources" column in table 1 corresponds to the first number (181 in the
@@ -239,7 +239,8 @@ git diff with-checker
 
 The number of true/false positives were counted by hand by looking at these
 diffs. You can also check the numbers by running these commands in the relevant
-project directories (TODO: double-check that these give the expected numbers):
+project directories (note that on ZooKeeper these commands give a few duplicates
+for true positives, so the numbers in the paper are slightly lower):
 ```
 grep -EoniR "//\s*TP:" * | wc -l
 grep -EoniR "//\s*FP:" * | wc -l
