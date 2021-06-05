@@ -85,7 +85,7 @@ plume-util:
 ./run-always-call-on-plume-util.sh
 ```
 
-Check that you get a "build succeeded" message at the end.
+Check that you get a "BUILD SUCCESSFUL" message at the end.
 
 Running these commands takes about (TODO: minutes).
 
