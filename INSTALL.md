@@ -13,7 +13,7 @@ The `object-construction-checker` directory contains the source code for
 the tool.
 
 Its test suite (a set of simple Java programs with expected errors) appears
-in the the `object-construction-checker/tests/mustcall` and
+in the `object-construction-checker/tests/mustcall` and
 `object-construction-checker/tests/socket` subdirectories. To run the
 tests, run `./gradlew build` from the root directory. You can add new tests
 by placing them in one of these directories, if you want to see how the
